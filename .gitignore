@@ -1,2 +1,4 @@
 /curriculo-store.client/
 /Curriculo-store.Server/
+.env
+.vs/

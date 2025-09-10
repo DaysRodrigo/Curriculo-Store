@@ -1,13 +1,15 @@
-version: "3.9"
 services:
   backend:
     build:
-      context: ./Curriculo-store.Server
+      context: ./Curriculo-store.Server/src
       dockerfile: Dockerfile.dev
     ports:
-      - "5000:5000"
+      - "5001:5001"
     volumes:
       - ./Curriculo-store.Server:/app
+    environment:
+    - ConnectionStrings__Default=Host=db;Port=5432;Database=mydb;Username=postgres;Password=postgres
+    - ASPNETCORE_ENVIRONMENT=Development
 
 
 
@@ -18,8 +20,26 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./curriculo-store.client:/app
+      - ./curriculo-store.client:/app:cached
+      - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+    command: sh -c "npm ci && npm run dev"
     depends_on:
       - backend
+
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
